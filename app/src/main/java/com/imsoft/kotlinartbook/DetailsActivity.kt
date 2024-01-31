@@ -33,7 +33,18 @@ class DetailsActivity : AppCompatActivity() {
         registerLauncher()
     }
 
-    fun saveBtnClick(view: View) {}
+    fun saveBtnClick(view: View) {
+
+        val artName = binding.titleText.text.toString()
+        val artistName = binding.artistNameText.text.toString()
+        val year = binding.yearText.text.toString()
+
+        if (selectedBitmap != null) {
+            val minimizeBitmap = makeMinimizeBitmap(selectedBitmap!!, 300)
+        }
+
+    }
+
     fun selectImageClick(view: View) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -97,6 +108,29 @@ class DetailsActivity : AppCompatActivity() {
 
 
     }
+
+
+    private fun makeMinimizeBitmap (image: Bitmap, maxSize: Int): Bitmap {
+
+        var width = image.width
+        var height = image.height
+
+        val bitmapRatio: Double = width.toDouble() / height.toDouble()
+
+        if (bitmapRatio > 1) {
+            width = maxSize
+            val scaledHeight = width / bitmapRatio
+            height = scaledHeight.toInt()
+        } else {
+            height = maxSize
+            val scaledWidth = height * bitmapRatio
+            width = scaledWidth.toInt()
+        }
+
+
+        return Bitmap.createScaledBitmap(image, width, height, true)
+    }
+
 
     private fun registerLauncher() {
 
