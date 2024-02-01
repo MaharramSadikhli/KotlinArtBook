@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 import com.imsoft.kotlinartbook.databinding.ActivityDetailsBinding
+import java.io.ByteArrayOutputStream
 
 class DetailsActivity : AppCompatActivity() {
 
@@ -41,6 +42,31 @@ class DetailsActivity : AppCompatActivity() {
 
         if (selectedBitmap != null) {
             val minimizeBitmap = makeMinimizeBitmap(selectedBitmap!!, 300)
+
+            val outputStream = ByteArrayOutputStream()
+            minimizeBitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStream)
+            val imageByteArray = outputStream.toByteArray()
+
+            try {
+
+                val db = this.openOrCreateDatabase("ArtBookDB", MODE_PRIVATE, null)
+                db.execSQL("CREATE TABLE IF NOT EXISTS artbook (id INTEGER PRIMARY KEY, artname VARCHAR, artistname VARCHAR, year VARCHAR, image BLOB)")
+
+                val sqlString = "INSERT INTO artbook (artname, artistname, year, image) VALUES (?, ?, ?, ?)"
+                val statement = db.compileStatement(sqlString)
+                statement.bindString(1, artName)
+                statement.bindString(2, artistName)
+                statement.bindString(3, year)
+                statement.bindBlob(4, imageByteArray)
+                statement.execute()
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            val intent = Intent(this@DetailsActivity, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(intent)
         }
 
     }
